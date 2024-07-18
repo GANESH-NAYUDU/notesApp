@@ -105,6 +105,6 @@ app.post("/login", async (request, response) => {
 ////
 
 //HOME APL
-app.GET("/", (request, response) => {
+app.get("/", (request, response) => {
   response.send("GANESH NAYUDU");
 });
