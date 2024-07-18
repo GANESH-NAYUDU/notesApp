@@ -1,4 +1,4 @@
-GET https://ganinoteapp.onrender.com/home
+GET http://localhost:3000
 
 
 ###
@@ -7,7 +7,7 @@ content-type : application/json
 
 {
 
-    "username" : "GaneshNaidu",
+    "username" : "Naidu",
     "password" : "Gan@117"
 }
 

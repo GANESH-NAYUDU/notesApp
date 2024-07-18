@@ -52,10 +52,11 @@ const authenticateToken = (request, response, next) => {
 };
 ///
 
-//signup API
-app.post("/signup/", async (request, response) => {
+//SIGNUP POST API
+app.post("/signup", async (request, response) => {
   const { username, password } = request.body;
   const hashedPassword = await bcrypt.hash(request.body.password, 10);
+  console.log(request.body.password);
   const selectUserQuery = `SELECT * FROM usertable WHERE username = '${username}'`;
   const dbUser = await db.get(selectUserQuery);
   if (dbUser === undefined) {
@@ -78,7 +79,7 @@ app.post("/signup/", async (request, response) => {
 });
 //
 
-//LOGIN API
+//LOGIN POST API
 
 app.post("/login", async (request, response) => {
   const { username, password } = request.body;
@@ -102,9 +103,16 @@ app.post("/login", async (request, response) => {
   }
 });
 
-////
-
-//HOME APL
-app.get("/signup/", (request, response) => {
+//SIGNUP GET API
+app.get("/signup", (request, response) => {
   response.sendFile("pages/signup.html", { root: __dirname });
+});
+//LOGIN GET API
+app.get("/login", (request, response) => {
+  response.sendFile("pages/login.html", { root: __dirname });
+});
+
+//HOME API
+app.get("/", (request, response) => {
+  response.sendFile("pages/home.html", { root: __dirname });
 });
