@@ -105,6 +105,6 @@ app.post("/login", async (request, response) => {
 ////
 
 //HOME APL
-app.get("signup", (request, response) => {
+app.get("/signup/", (request, response) => {
   response.sendFile("pages/signup.html", { root: __dirname });
 });
