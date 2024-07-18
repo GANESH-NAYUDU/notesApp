@@ -56,8 +56,7 @@ const authenticateToken = (request, response, next) => {
 app.post("/signup", async (request, response) => {
   const { username, password } = request.body;
   const hashedPassword = await bcrypt.hash(request.body.password, 10);
-  console.log(request.body.password);
-  const selectUserQuery = `SELECT * FROM usertable WHERE username = '${username}'`;
+  const selectUserQuery = `SELECT username FROM usertable WHERE username = '${username}'`;
   const dbUser = await db.get(selectUserQuery);
   if (dbUser === undefined) {
     const createUserQuery = `
@@ -71,10 +70,11 @@ app.post("/signup", async (request, response) => {
         )`;
     const dbResponse = await db.run(createUserQuery);
     const newUserId = dbResponse.lastID;
-    response.send(`Created new user with ${newUserId}`);
+    response.status(200);
+    response.send({ message: "user created", userId: newUserId });
   } else {
     response.status = 400;
-    response.send("User already exists");
+    response.send({ message: "user already exits" });
   }
 });
 //
@@ -87,7 +87,7 @@ app.post("/login", async (request, response) => {
   const dbUser = await db.get(selectUserQuery);
   if (dbUser === undefined) {
     response.status(400);
-    response.send("Invalid User");
+    response.send({ message: "Invalid User" });
   } else {
     const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
     if (isPasswordMatched === true) {
@@ -98,7 +98,7 @@ app.post("/login", async (request, response) => {
       response.send({ jwtToken });
     } else {
       response.status(400);
-      response.send("Invalid Password");
+      response.send({ message: "Invalid Password" });
     }
   }
 });

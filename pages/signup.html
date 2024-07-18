@@ -116,6 +116,7 @@
         >
           Sign up as a new User
         </button>
+        <p id="success-message"></p>
       </form>
     </div>
 
@@ -128,6 +129,7 @@
       const signUpBtn = document.getElementById("signUpBtn");
       const userName = document.getElementById("user-name");
       const userpassword = document.getElementById("password");
+      const alertMsg = document.getElementById("success-message");
       signUpBtn.addEventListener("click", async () => {
         const response = await fetch("/signup", {
           method: "POST",
@@ -140,8 +142,45 @@
             username: userName.value,
             password: userpassword.value,
           }),
-        });
-        console.log(response.json().body);
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (jsonData) {
+            const takenJsonData = jsonData;
+            if (takenJsonData.message === "user already exits") {
+              alertMsg.innerHTML = "Username already exists";
+            } else {
+              alertMsg.innerHTML = "User succefully created";
+              const userId = takenJsonData.userId;
+              fetch("/login", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                  Authorization: "Bearer ACCESS-TOKEN",
+                },
+                body: JSON.stringify({
+                  username: userName.value,
+                  password: userpassword.value,
+                }),
+              })
+                .then(function (response) {
+                  return response.json();
+                })
+                .then(function (jsonData) {
+                  if (jsonData.message === "Invalid User") {
+                    alert("invalid User");
+                  } else if (jsonData.message === "Invalid Password") {
+                    alert("Invalid Password");
+                  } else {
+                    jwtToken = jsonData.jwtToken;
+                    localStorage.setItem("jwttoken", jwtToken);
+                    location.assign("/");
+                  }
+                });
+            }
+          });
       });
     </script>
   </body>
