@@ -90,14 +90,14 @@
       <form>
         <!-- Email input -->
         <div data-mdb-input-init class="form-outline mb-4">
-          <label class="form-label" for="form2Example1">Email address</label>
-          <input type="email" id="form2Example1" class="form-control" />
+          <label class="form-label" for="userName">Username</label>
+          <input type="email" id="userName" class="form-control" />
         </div>
 
         <!-- Password input -->
         <div data-mdb-input-init class="form-outline mb-4">
-          <label class="form-label" for="form2Example2">Password</label>
-          <input type="password" id="form2Example2" class="form-control" />
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" class="form-control" />
         </div>
 
         <!-- 2 column grid layout for inline styling -->
@@ -109,6 +109,7 @@
 
         <!-- Submit button -->
         <button
+          id="loginBtn"
           type="button"
           data-mdb-button-init
           data-mdb-ripple-init
@@ -116,6 +117,7 @@
         >
           Sign in
         </button>
+        <p id="warningMsg"></p>
 
         <!-- Register buttons -->
         <div class="text-center">
@@ -129,6 +131,42 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
-    <script src="main.js"></script>
+    <script>
+      const loginBtn = document.getElementById("loginBtn");
+      const userName = document.getElementById("userName");
+      const userPassword = document.getElementById("password");
+      const warningMsg = document.getElementById("warningMsg");
+
+      loginBtn.addEventListener("click", async () => {
+        fetch("/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: "Bearer ACCESS-TOKEN",
+          },
+          body: JSON.stringify({
+            username: userName.value,
+            password: userPassword.value,
+          }),
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (jsonData) {
+            if (jsonData.message === "Invalid User") {
+              alert("invalid User");
+            } else if (jsonData.message === "Invalid Password") {
+              alert("Invalid Password");
+            } else {
+              jwtToken = jsonData.jwtToken;
+              userId = jsonData.userId;
+              localStorage.setItem("jwttoken", jwtToken);
+              localStorage.setItem("userId", jsonData.userId);
+              location.assign("/");
+            }
+          });
+      });
+    </script>
   </body>
 </html>

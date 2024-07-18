@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ganiNoteApp login</title>
+    <title>ganiNoteApp signup</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -176,6 +176,7 @@
                   } else {
                     jwtToken = jsonData.jwtToken;
                     localStorage.setItem("jwttoken", jwtToken);
+                    localStorage.setItem("userId", jsonData.userId);
                     location.assign("/");
                   }
                 });
