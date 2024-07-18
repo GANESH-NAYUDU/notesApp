@@ -106,5 +106,5 @@ app.post("/login", async (request, response) => {
 
 //HOME APL
 app.get("/home", (request, response) => {
-  response.send("GANESH NAYUDU");
+  response.sendFile("pages/home.html", { root: __dirname });
 });
