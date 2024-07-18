@@ -103,3 +103,8 @@ app.post("/login", async (request, response) => {
 });
 
 ////
+
+//HOME APL
+app.GET("/", (request, response) => {
+  console.log("HII GANESH");
+});
