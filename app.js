@@ -95,7 +95,6 @@ app.post("/login", async (request, response) => {
         username: username,
       };
       const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
-      console.log(dbUser);
       response.send({ userId: dbUser.userid, jwtToken: jwtToken });
     } else {
       response.status(400);
@@ -116,4 +115,34 @@ app.get("/login", (request, response) => {
 //HOME API
 app.get("/", (request, response) => {
   response.sendFile("pages/home.html", { root: __dirname });
+});
+
+//getAllNotes POST API
+app.post("/getAllNotes", authenticateToken, async (request, response) => {
+  const { userId } = request.body;
+  getAllNotesQuery = `
+            SELECT * 
+            FROM 
+                notesTable
+            WHERE userid = ${userId};
+  `;
+  const allNotes = await db.all(getAllNotesQuery);
+  response.send({ allNotes: allNotes });
+});
+
+//addNote POST API
+app.post("/addNote", authenticateToken, async (request, response) => {
+  const noteDetails = request.body;
+  const { userId, desp, noteTitle } = noteDetails;
+  var dt = new Date();
+
+  const date =
+    dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+  addNoteQuery = `
+  INSERT INTO notesTable (noteTitle,desp,userId,createdAt)
+  VALUES('${noteTitle}','${desp}',${userId},'${date}')
+  `;
+
+  const addedNote = await db.run(addNoteQuery);
+  response.send({ message: "Note Added" });
 });

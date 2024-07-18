@@ -175,7 +175,7 @@
                     alert("Invalid Password");
                   } else {
                     jwtToken = jsonData.jwtToken;
-                    localStorage.setItem("jwttoken", jwtToken);
+                    localStorage.setItem("jwtToken", jwtToken);
                     localStorage.setItem("userId", jsonData.userId);
                     location.assign("/");
                   }
