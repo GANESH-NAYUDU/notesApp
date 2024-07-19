@@ -218,3 +218,42 @@ app.post("/restoreNote", authenticateToken, async (request, response) => {
   await db.run(addToNotesQuery);
   await db.run(deleteTrashQuery);
 });
+
+//GET ARCHIVES API
+app.get("/archive", (request, response) => {
+  response.sendFile("pages/archive.html", { root: __dirname });
+});
+
+//GET ALL ARCHIVES API
+app.post("/archive", authenticateToken, async (request, response) => {
+  const { userId } = request.body;
+  const getArchiveNotesQuery = `
+            SELECT * 
+            FROM archiveTable 
+            WHERE
+                userId = ${userId};
+    `;
+  const allArchiveNotes = await db.all(getArchiveNotesQuery);
+  response.send({ allArchiveNotes: allArchiveNotes });
+});
+//
+//MAKE ARCHIVE PUT API
+app.put("/", authenticateToken, async (request, response) => {
+  const { noteTitle, desp, noteId, userId } = request.body;
+  const dt = new Date();
+
+  const date =
+    dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+
+  const deleteNoteQuery = `
+                DELETE FROM notesTable 
+                WHERE noteId = ${noteId}; 
+  `;
+  const addToArchiveQuery = `
+        INSERT INTO archiveTable(noteTitle,desp,userId,createdAt)
+        VALUES ('${noteTitle}','${desp}',${userId},'${date}')
+  `;
+  await db.run(addToArchiveQuery);
+  await db.run(deleteNoteQuery);
+  response.send({ message: "Note Moved To Archive" });
+});
