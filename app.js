@@ -134,7 +134,7 @@ app.post("/getAllNotes", authenticateToken, async (request, response) => {
 app.post("/addNote", authenticateToken, async (request, response) => {
   const noteDetails = request.body;
   const { userId, desp, noteTitle } = noteDetails;
-  var dt = new Date();
+  const dt = new Date();
 
   const date =
     dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
@@ -145,4 +145,76 @@ app.post("/addNote", authenticateToken, async (request, response) => {
 
   const addedNote = await db.run(addNoteQuery);
   response.send({ message: "Note Added" });
+});
+
+///DELETE NOTE API
+app.delete("/", authenticateToken, async (request, response) => {
+  const { noteTitle, desp, noteId, userId } = request.body;
+  const dt = new Date();
+
+  const date =
+    dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+
+  const deleteNoteQuery = `
+                DELETE FROM notesTable 
+                WHERE noteId = ${noteId}; 
+  `;
+  const addToTrashQuery = `
+        INSERT INTO trashTable(noteTitle,desc,userId,deletedAt)
+        VALUES ('${noteTitle}','${desp}',${userId},'${date}')
+  `;
+  const trashId = await db.run(addToTrashQuery);
+  const deletedNoteId = await db.run(deleteNoteQuery);
+  console.log(trashId.lastID);
+  response.send({ message: "Note Moved To Trash" });
+});
+
+//TRASHNOTES GET API
+app.get("/trash", (request, response) => {
+  response.sendFile("pages/trash.html", { root: __dirname });
+});
+
+//TRASHNOTES POST API
+app.post("/trash", authenticateToken, async (request, response) => {
+  const { userId } = request.body;
+  const getTrashNotesQuery = `
+            SELECT * 
+            FROM trashTable 
+            WHERE
+                userId = ${userId};
+    `;
+  const allTrashNotes = await db.all(getTrashNotesQuery);
+  response.send({ allTrashNotes: allTrashNotes });
+});
+
+//CLEAR TRASH API
+app.delete("/trash", authenticateToken, async (request, response) => {
+  const { userId } = request.body;
+  const clearTrashQuery = `
+        DELETE FROM trashTable
+        WHERE 
+            userId = ${userId};
+    `;
+  await db.run(clearTrashQuery);
+  response.send({ message: "Cleared Trash" });
+});
+
+//RESTORE NOTE API
+app.post("/restoreNote", authenticateToken, async (request, response) => {
+  const { noteTitle, desp, userId, trashId, deletedAt } = request.body;
+  const dt = new Date();
+
+  const date =
+    dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+
+  const deleteTrashQuery = `
+                DELETE FROM trashTable 
+                WHERE trashId = ${trashId}; 
+  `;
+  const addToNotesQuery = `
+        INSERT INTO notesTable(noteId,noteTitle,desp,userId,createdAt)
+        VALUES (${trashId},'${noteTitle}','${desp}',${userId},'${deletedAt}')
+  `;
+  await db.run(addToNotesQuery);
+  await db.run(deleteTrashQuery);
 });

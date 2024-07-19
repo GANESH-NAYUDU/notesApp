@@ -42,3 +42,30 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikdhb
     "desp" : "i createfafafaed a new note",
     "userId" : "47"
 }
+
+###
+DELETE http://localhost:3000
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkdhbmVzaCBOYWlkdSIsImlhdCI6MTcyMTMzMjE1OX0.8J_LmZDHF1-_NC4jIVDDO9bX_GvEhOQjzqQYAYtcjhs
+
+{
+    "noteId" : "1",
+    "noteTitle": "new",
+    "desp" : "i createfafafaed a new note",
+    "userId" : "47"
+}
+
+
+###
+GET http://localhost:3000/trash?userId=47
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkdhbmVzaCBOYWlkdSIsImlhdCI6MTcyMTMzMjE1OX0.8J_LmZDHF1-_NC4jIVDDO9bX_GvEhOQjzqQYAYtcjhs
+
+###
+POST http://localhost:3000/trash 
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkdhbmVzaCBOYWlkdSIsImlhdCI6MTcyMTMzMjE1OX0.8J_LmZDHF1-_NC4jIVDDO9bX_GvEhOQjzqQYAYtcjhs
+
+{
+    "userId" : "47"
+}

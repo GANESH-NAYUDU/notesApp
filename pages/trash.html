@@ -29,7 +29,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">Home</a>
+              <a class="nav-link" aria-current="page" href="/">Home</a>
             </li>
 
             <li class="nav-item">
@@ -39,7 +39,7 @@
               <a class="nav-link" href="/remainder">Remainder</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/trash">Trash</a>
+              <a class="nav-link active" href="/trash">Trash</a>
             </li>
 
             <li class="nav-item dropdown">
@@ -65,12 +65,106 @@
         </div>
       </div>
     </nav>
-
+    <div class="container">
+      <h1 class="mt-4">Your Deleted Notes</h1>
+      <p class="mt-2">Notes in trash get automatically deleted after 30days.</p>
+      <button id="clearTrashBtn" class="btn btn-primary m-2">
+        Clear Trash
+      </button>
+      <div class="deletedNotes row"></div>
+    </div>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
-    <script src="main.js"></script>
+    <script>
+      const jwtToken = localStorage.getItem("jwtToken");
+      const userId = JSON.parse(localStorage.getItem("userId"));
+      const clearTrashBtn = document.getElementById("clearTrashBtn");
+      clearTrashBtn.addEventListener("click", () => {
+        fetch("/trash", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+          body: JSON.stringify({
+            userId: userId,
+          }),
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then((jsonData) => {
+            console.log(jsonData.message);
+            fetchNotes();
+          });
+      });
+
+      const fetchNotes = () => {
+        fetch("/trash", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+          body: JSON.stringify({
+            userId: userId,
+          }),
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then((jsonData) => {
+            const allTrashNotes = jsonData.allTrashNotes;
+            let noteContainer = document.querySelector(".deletedNotes");
+            noteContainer.innerHTML = "";
+
+            allTrashNotes.forEach((element) => {
+              let note = `
+                  <div class="card mx-2 mt-2" style="width: 18rem">
+          <div class="card-body">
+            <h5 class="card-title">${element.noteTitle}</h5>
+            <p class="card-text">
+             ${element.desc}
+            </p>
+            <a href="#" id="restoreBtn" class="card-link">Restore</a>
+          </div>
+        </div>
+              `;
+
+              noteContainer.innerHTML += note;
+              const restoreBtn = document.getElementById("restoreBtn");
+              restoreBtn.addEventListener("click", () => {
+                fetch("/restoreNote", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Authorization: `Bearer ${jwtToken}`,
+                  },
+                  body: JSON.stringify({
+                    userId: userId,
+                    trashId: element.trashId,
+                    noteTitle: element.noteTitle,
+                    desp: element.desc,
+                    date: element.deletedAt,
+                  }),
+                })
+                  .then((response) => {
+                    return response.json();
+                  })
+                  .then((jsonData) => {
+                    fetchNotes();
+                  });
+              });
+            });
+          });
+      };
+      fetchNotes();
+    </script>
   </body>
 </html>
