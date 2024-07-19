@@ -217,6 +217,7 @@ app.post("/restoreNote", authenticateToken, async (request, response) => {
   `;
   await db.run(addToNotesQuery);
   await db.run(deleteTrashQuery);
+  response.send({ message: "Note Restored" });
 });
 
 //GET ARCHIVES API
