@@ -163,14 +163,14 @@
             </p>
             <a href="#" class="card-link">Archive</a>
             <a href="#" class="card-link deleteBtn">Delete</a>
-            <a href="#" class="card-link">Remind Me</a>
+            <a href="#" class="card-link archiveBtn">Remind Me</a>
           </div>
         </div>
               `;
 
               noteContainer.innerHTML += note;
               const deleteBtn = document.querySelector(".deleteBtn");
-              const archiveBtn = document.getElementById("trash-btn");
+              const archiveBtn = document.querySelector(".archiveBtn");
               //delete note
               deleteBtn.addEventListener("click", () => {
                 fetch("/", {
