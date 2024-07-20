@@ -133,13 +133,13 @@
             <p class="card-text">
              ${element.desc}
             </p>
-            <a href="#" id="restoreBtn" class="card-link">Restore</a>
+            <a href="#"  class="card-link restoreBtn">Restore</a>
           </div>
         </div>
               `;
 
               noteContainer.innerHTML += note;
-              const restoreBtn = document.getElementById("restoreBtn");
+              const restoreBtn = document.querySelector(".restoreBtn");
               restoreBtn.addEventListener("click", () => {
                 fetch("/restoreNote", {
                   method: "POST",
@@ -168,7 +168,6 @@
           });
       };
       fetchNotes();
-      const homeBtn = document.getElementById("homeBtn");
     </script>
   </body>
 </html>

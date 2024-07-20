@@ -258,3 +258,19 @@ app.put("/", authenticateToken, async (request, response) => {
   await db.run(deleteNoteQuery);
   response.send({ message: "Note Moved To Archive" });
 });
+
+//Unarchive Note API
+app.post("/unArchiveNote", authenticateToken, async (request, response) => {
+  const { archiveId, userId, desp, date, noteTitle } = request.body;
+  const addToNotesQuery = `
+    INSERT INTO notesTable(noteTitle,desp,userId,createdAt)
+    VALUES ('${noteTitle}','${desp}',${userId},'${date}');
+  `;
+  const deleteFromArchiveQuery = `
+    DELETE FROM archiveTable 
+    WHERE archiveId = ${archiveId};
+  `;
+  await db.run(addToNotesQuery);
+  await db.run(deleteFromArchiveQuery);
+  response.send({ message: "Note Unarchived" });
+});
