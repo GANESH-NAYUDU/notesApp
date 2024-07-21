@@ -156,14 +156,14 @@
             allNotes.forEach((element) => {
               let note = `
                   <div class="card mx-2 mt-2" style="width: 18rem">
-          <div class="card-body">
+          <div class="card-body newNote">
             <h5 class="card-title">${element.noteTitle}</h5>
             <p class="card-text">
              ${element.desp}
             </p>
-            <a href="#" class="card-link archiveBtn">Archive</a>
-            <a href="#" class="card-link deleteBtn">Delete</a>
-            <a href="#" class="card-link">Remind Me</a>
+            <a href="#" data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link archiveBtn">Archive</a>
+            <a href="#" data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link deleteBtn">Delete</a>
+            <a href="#" data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link">Remind Me</a>
           </div>
         </div>
               `;
@@ -173,6 +173,9 @@
               const archiveBtn = document.querySelector(".archiveBtn");
               //delete note
               deleteBtn.addEventListener("click", () => {
+                const currentDlt = event.target;
+                const deleteNoteId = currentDlt.getAttribute("data-noteId");
+                console.log(deleteNoteId);
                 fetch("/", {
                   method: "DELETE",
                   headers: {
@@ -182,19 +185,26 @@
                   },
                   body: JSON.stringify({
                     userId: userId,
-                    noteId: element.noteId,
-                    noteTitle: element.noteTitle,
-                    desp: element.desp,
+                    noteId: currentDlt.getAttribute("data-noteId"),
+                    noteTitle: currentDlt.getAttribute("data-noteTitle"),
+                    desp: currentDlt.getAttribute("data-desp"),
                   }),
                 }).then((response) => {
                   return response.json().then((jsonData) => {
                     console.log(jsonData.message);
+
                     fetchNotes();
                   });
                 });
               });
+
               //archive note
+
               archiveBtn.addEventListener("click", () => {
+                const currentArchive = event.target;
+                const archiveNoteId = currentArchive.getAttribute(
+                  "data-noteId"
+                );
                 fetch("/", {
                   method: "PUT",
                   headers: {
@@ -204,9 +214,9 @@
                   },
                   body: JSON.stringify({
                     userId: userId,
-                    noteId: element.noteId,
-                    noteTitle: element.noteTitle,
-                    desp: element.desp,
+                    noteId: currentArchive.getAttribute("data-noteId"),
+                    noteTitle: currentArchive.getAttribute("data-noteTitle"),
+                    desp: currentArchive.getAttribute("data-desp"),
                   }),
                 }).then((response) => {
                   return response.json().then((jsonData) => {
@@ -218,7 +228,9 @@
             });
           });
       };
+
       fetchNotes();
+
       const submitBtn = document.getElementById("submitBtn");
       submitBtn.addEventListener("click", () => {
         const titleInputEL = document.getElementById("title");

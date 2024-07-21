@@ -191,9 +191,7 @@ app.post("/trash", authenticateToken, async (request, response) => {
 app.delete("/trash", authenticateToken, async (request, response) => {
   const { userId } = request.body;
   const clearTrashQuery = `
-        DELETE FROM trashTable
-        WHERE 
-            userId = ${userId};
+        DELETE FROM trashTable WHERE userId = ${userId};
     `;
   await db.run(clearTrashQuery);
   response.send({ message: "Cleared Trash" });
