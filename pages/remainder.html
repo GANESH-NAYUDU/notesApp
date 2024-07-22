@@ -64,12 +64,81 @@
         </div>
       </div>
     </nav>
-
+    <div class="container">
+      <h1 class="mt-4">Your Remainders</h1>
+      <div class="row remainderContainer"></div>
+    </div>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
-    <script></script>
+    <script>
+      const userId = JSON.parse(localStorage.getItem("userId"));
+      const jwtToken = localStorage.getItem("jwtToken");
+      const fetchNotes = () => {
+        fetch("/remainder", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${jwtToken}`,
+          },
+          body: JSON.stringify({ userId: userId }),
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then((jsonData) => {
+            console.log(jsonData);
+            const allNotes = jsonData.allNotes;
+            const noteContainer = document.querySelector(".remainderContainer");
+            noteContainer.innerHTML = "";
+            allNotes.forEach((element) => {
+              let note = `
+                  <div class="card mx-2 mt-2" style="width: 18rem">
+          <div class="card-body">
+            <h5 class="card-title">${element.noteTitle}</h5>
+            <p class="card-text">
+             ${element.desp}
+            </p>
+            <button data-noteId="${element.noteId}" class="btn btn-outline-dark btn-sm removeRemainderBtn">Remove</button>
+          </div>
+        </div>`;
+              noteContainer.innerHTML += note;
+
+              //
+              const removeBtn = document.querySelectorAll(
+                ".removeRemainderBtn"
+              );
+              removeBtn.forEach((eachEl) => {
+                eachEl.addEventListener("click", () => {
+                  fetch("/remainder", {
+                    method: "DELETE",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                      Authorization: `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({
+                      noteId: eachEl.getAttribute("data-noteId"),
+                      userId: userId,
+                    }),
+                  })
+                    .then((response) => {
+                      return response.json();
+                    })
+                    .then((jsonData) => {
+                      fetchNotes();
+                    });
+                });
+              });
+              //
+            });
+          });
+      };
+
+      fetchNotes();
+    </script>
   </body>
 </html>

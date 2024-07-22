@@ -155,18 +155,22 @@
 
             allNotes.forEach((element) => {
               let note = `
-                  <div class="card mx-2 mt-2" style="width: 18rem">
-          <div class="card-body newNote">
-            <h5 class="card-title">${element.noteTitle}</h5>
-            <p class="card-text">
-             ${element.desp}
-            </p>
-            <a  data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link archiveBtn">Archive</a>
-            <a  data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link deleteBtn">Delete</a>
-            <a  data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link">Remind Me</a>
+                    <div class="card mx-2 mt-2" style="width: 18rem">
+            <div class="card-body newNote">
+              <h5 class="card-title">${element.noteTitle}</h5>
+              <p class="card-text">
+               ${element.desp}
+              </p>
+
+      <button data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="btn btn-outline-dark btn-sm archiveBtn">Archive</button>
+      <button data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="btn btn-outline-dark btn-sm deleteBtn">Delete</button>
+       <button data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="btn btn-outline-dark btn-sm remainderBtn">Remind Me</button>
+
+
+
+            </div>
           </div>
-        </div>
-              `;
+                `;
 
               noteContainer.innerHTML += note;
 
@@ -230,8 +234,35 @@
                     });
                   });
                 });
-                ///
               });
+              ///
+              //Remainder Note
+              const remainderBtn = document.querySelectorAll(".remainderBtn");
+              remainderBtn.forEach((eachEL) => {
+                console.log(eachEL);
+                eachEL.addEventListener(
+                  "click",
+                  fetch("/AddToRemainder", {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                      Authorization: `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({
+                      noteId: eachEL.getAttribute("data-noteId"),
+                      userId: userId,
+                    }),
+                  })
+                    .then((response) => {
+                      return response.json();
+                    })
+                    .then((jsonData) => {
+                      console.log(jsonData.message);
+                    })
+                );
+              });
+              //
             });
           });
       };

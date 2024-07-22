@@ -218,7 +218,7 @@ app.post("/restoreNote", authenticateToken, async (request, response) => {
   response.send({ message: "Note Restored" });
 });
 
-//GET ARCHIVES API
+//GET ARCHIVES PAGE API
 app.get("/archive", (request, response) => {
   response.sendFile("pages/archive.html", { root: __dirname });
 });
@@ -276,4 +276,51 @@ app.post("/unArchiveNote", authenticateToken, async (request, response) => {
 //REMAINDER PAGE API
 app.get("/remainder", (request, response) => {
   response.sendFile("pages/remainder.html", { root: __dirname });
+});
+
+//ADD TO REMAINDERS API
+app.put("/AddToRemainder", authenticateToken, async (request, response) => {
+  const { noteId, userId } = request.body;
+  const addToRemainderQuery = `
+        INSERT INTO remainderTable(userId,noteId)
+        VALUES (${userId},${noteId});
+    `;
+  await db.run(addToRemainderQuery);
+  response.send({ message: "Note Added To Remainder" });
+});
+
+//GET ALL REMAINDER NOTES API
+app.post("/remainder", authenticateToken, async (request, response) => {
+  const { userId } = request.body;
+  const getRemainderNoteIdQuery = `
+        SELECT noteId
+        FROM remainderTable
+        WHERE userId = ${userId};
+    `;
+  let currNote = "";
+  const allRemainderNoteId = await db.all(getRemainderNoteIdQuery);
+  const allRemainderNotes = [];
+  for (const eachNoteId of allRemainderNoteId) {
+    let currNoteId = eachNoteId.noteId;
+    let getCurrNoteQuery = `
+        SELECT * 
+        FROM notesTable
+        WHERE noteId = ${currNoteId}; 
+    `;
+    currNote = await db.get(getCurrNoteQuery);
+
+    allRemainderNotes.push(currNote);
+  }
+
+  response.send({ allNotes: allRemainderNotes });
+});
+
+//DELETE REMAINDER API
+app.delete("/remainder", authenticateToken, async (request, response) => {
+  const { userId, noteId } = request.body;
+  const deleteRemainderQuery = `
+        DELETE FROM remainderTable
+        WHERE noteId = ${noteId} AND userId = ${userId};
+    `;
+  await db.run(deleteRemainderQuery);
 });
