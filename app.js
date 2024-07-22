@@ -272,3 +272,8 @@ app.post("/unArchiveNote", authenticateToken, async (request, response) => {
   await db.run(deleteFromArchiveQuery);
   response.send({ message: "Note Unarchived" });
 });
+
+//REMAINDER PAGE API
+app.get("/remainder", (request, response) => {
+  response.sendFile("pages/remainder.html", { root: __dirname });
+});

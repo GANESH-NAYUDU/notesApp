@@ -133,36 +133,41 @@
             <p class="card-text">
              ${element.desc}
             </p>
-            <a href="#"  class="card-link restoreBtn">Restore</a>
+            <a  data-trashId="${element.trashId}" data-noteTitle="${element.noteTitle}" data-desc="${element.desc}" data-deletedAt="${element.deletedAt}"  class="card-link restoreBtn">Restore</a>
           </div>
         </div>
               `;
 
               noteContainer.innerHTML += note;
-              const restoreBtn = document.querySelector(".restoreBtn");
-              restoreBtn.addEventListener("click", () => {
-                fetch("/restoreNote", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                    Authorization: `Bearer ${jwtToken}`,
-                  },
-                  body: JSON.stringify({
-                    userId: userId,
-                    trashId: element.trashId,
-                    noteTitle: element.noteTitle,
-                    desp: element.desc,
-                    date: element.deletedAt,
-                  }),
-                })
-                  .then((response) => {
-                    return response.json();
+              const restoreBtn = document.querySelectorAll(".restoreBtn");
+
+              restoreBtn.forEach((eachEl) => {
+                //
+                eachEl.addEventListener("click", () => {
+                  fetch("/restoreNote", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                      Authorization: `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({
+                      userId: userId,
+                      trashId: eachEl.getAttribute("data-trashId"),
+                      noteTitle: eachEl.getAttribute("data-noteTitle"),
+                      desp: eachEl.getAttribute("data-desc"),
+                      date: eachEl.getAttribute("data-deletedAt"),
+                    }),
                   })
-                  .then((jsonData) => {
-                    console.log(jsonData.message);
-                    fetchNotes();
-                  });
+                    .then((response) => {
+                      return response.json();
+                    })
+                    .then((jsonData) => {
+                      console.log(jsonData.message);
+                      fetchNotes();
+                    });
+                });
+                //
               });
             });
           });

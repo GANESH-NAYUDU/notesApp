@@ -161,69 +161,76 @@
             <p class="card-text">
              ${element.desp}
             </p>
-            <a href="#" data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link archiveBtn">Archive</a>
-            <a href="#" data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link deleteBtn">Delete</a>
-            <a href="#" data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link">Remind Me</a>
+            <a  data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link archiveBtn">Archive</a>
+            <a  data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link deleteBtn">Delete</a>
+            <a  data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="card-link">Remind Me</a>
           </div>
         </div>
               `;
 
               noteContainer.innerHTML += note;
-              const deleteBtn = document.querySelector(".deleteBtn");
-              const archiveBtn = document.querySelector(".archiveBtn");
-              //delete note
-              deleteBtn.addEventListener("click", () => {
-                const currentDlt = event.target;
-                const deleteNoteId = currentDlt.getAttribute("data-noteId");
-                console.log(deleteNoteId);
-                fetch("/", {
-                  method: "DELETE",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                    Authorization: `Bearer ${jwtToken}`,
-                  },
-                  body: JSON.stringify({
-                    userId: userId,
-                    noteId: currentDlt.getAttribute("data-noteId"),
-                    noteTitle: currentDlt.getAttribute("data-noteTitle"),
-                    desp: currentDlt.getAttribute("data-desp"),
-                  }),
-                }).then((response) => {
-                  return response.json().then((jsonData) => {
-                    console.log(jsonData.message);
 
-                    fetchNotes();
+              //
+
+              //delete note
+              const deleteBtn = document.querySelectorAll(".deleteBtn");
+              deleteBtn.forEach((eachEl) => {
+                eachEl.addEventListener("click", () => {
+                  const currentDlt = eachEl;
+                  const deleteNoteId = currentDlt.getAttribute("data-noteId");
+                  console.log(deleteNoteId);
+                  fetch("/", {
+                    method: "DELETE",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                      Authorization: `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({
+                      userId: userId,
+                      noteId: currentDlt.getAttribute("data-noteId"),
+                      noteTitle: currentDlt.getAttribute("data-noteTitle"),
+                      desp: currentDlt.getAttribute("data-desp"),
+                    }),
+                  }).then((response) => {
+                    return response.json().then((jsonData) => {
+                      console.log(jsonData.message);
+
+                      fetchNotes();
+                    });
                   });
                 });
               });
 
               //archive note
-
-              archiveBtn.addEventListener("click", () => {
-                const currentArchive = event.target;
-                const archiveNoteId = currentArchive.getAttribute(
-                  "data-noteId"
-                );
-                fetch("/", {
-                  method: "PUT",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                    Authorization: `Bearer ${jwtToken}`,
-                  },
-                  body: JSON.stringify({
-                    userId: userId,
-                    noteId: currentArchive.getAttribute("data-noteId"),
-                    noteTitle: currentArchive.getAttribute("data-noteTitle"),
-                    desp: currentArchive.getAttribute("data-desp"),
-                  }),
-                }).then((response) => {
-                  return response.json().then((jsonData) => {
-                    console.log(jsonData.message);
-                    fetchNotes();
+              const archiveBtn = document.querySelectorAll(".archiveBtn");
+              archiveBtn.forEach((eachEl) => {
+                eachEl.addEventListener("click", () => {
+                  const currentArchive = eachEl;
+                  const archiveNoteId = currentArchive.getAttribute(
+                    "data-noteId"
+                  );
+                  fetch("/", {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                      Authorization: `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({
+                      userId: userId,
+                      noteId: currentArchive.getAttribute("data-noteId"),
+                      noteTitle: currentArchive.getAttribute("data-noteTitle"),
+                      desp: currentArchive.getAttribute("data-desp"),
+                    }),
+                  }).then((response) => {
+                    return response.json().then((jsonData) => {
+                      console.log(jsonData.message);
+                      fetchNotes();
+                    });
                   });
                 });
+                ///
               });
             });
           });
@@ -231,6 +238,7 @@
 
       fetchNotes();
 
+      //
       const submitBtn = document.getElementById("submitBtn");
       submitBtn.addEventListener("click", () => {
         const titleInputEL = document.getElementById("title");

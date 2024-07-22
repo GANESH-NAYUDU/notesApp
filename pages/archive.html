@@ -106,36 +106,39 @@
             <p class="card-text">
              ${element.desp}
             </p>
-            <a href="#"  class="card-link unArchiveBtn">Unarchive</a>
+            <a data-archiveId="${element.archiveId}" data-noteTitle="${element.noteTitle}"data-desp="${element.desp}"data-createdAt="${element.createdAt}" class="card-link unArchiveBtn">Unarchive</a>
           </div>
         </div>
               `;
 
               noteContainer.innerHTML += note;
-              const unArchiveBtn = document.querySelector(".unArchiveBtn");
-
-              unArchiveBtn.addEventListener("click", () => {
-                fetch("/unArchiveNote", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                    Authorization: `Bearer ${jwtToken}`,
-                  },
-                  body: JSON.stringify({
-                    userId: element.userId,
-                    archiveId: element.archiveId,
-                    noteTitle: element.noteTitle,
-                    desp: element.desp,
-                    date: element.createdAt,
-                  }),
-                })
-                  .then((response) => {
-                    return response.json();
+              const unArchiveBtn = document.querySelectorAll(".unArchiveBtn");
+              unArchiveBtn.forEach((eachEL) => {
+                //
+                eachEL.addEventListener("click", () => {
+                  fetch("/unArchiveNote", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                      Authorization: `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({
+                      userId: userId,
+                      archiveId: eachEL.getAttribute("data-archiveId"),
+                      noteTitle: eachEL.getAttribute("data-noteTitle"),
+                      desp: eachEL.getAttribute("data-desp"),
+                      date: eachEL.getAttribute("data-createdAt"),
+                    }),
                   })
-                  .then((jsonData) => {
-                    fetchNotes();
-                  });
+                    .then((response) => {
+                      return response.json();
+                    })
+                    .then((jsonData) => {
+                      fetchNotes();
+                    });
+                });
+                //
               });
             });
           });
