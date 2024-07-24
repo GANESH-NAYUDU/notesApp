@@ -159,12 +159,18 @@ app.delete("/", authenticateToken, async (request, response) => {
                 DELETE FROM notesTable 
                 WHERE noteId = ${noteId}; 
   `;
+
+  const deleteNoteFromRemainderQuery = `
+                DELETE FROM remainderTable 
+                WHERE noteId = ${noteId}; 
+  `;
   const addToTrashQuery = `
-        INSERT INTO trashTable(noteTitle,desc,userId,deletedAt)
-        VALUES ('${noteTitle}','${desp}',${userId},'${date}')
+        INSERT INTO trashTable(trashId,noteTitle,desc,userId,deletedAt)
+        VALUES (${noteId},'${noteTitle}','${desp}',${userId},'${date}')
   `;
   const trashId = await db.run(addToTrashQuery);
   const deletedNoteId = await db.run(deleteNoteQuery);
+  await db.run(deleteNoteFromRemainderQuery);
   console.log(trashId.lastID);
   response.send({ message: "Note Moved To Trash" });
 });
@@ -248,12 +254,18 @@ app.put("/", authenticateToken, async (request, response) => {
                 DELETE FROM notesTable 
                 WHERE noteId = ${noteId}; 
   `;
+  const deleteNoteFromRemainderQuery = `
+                DELETE FROM remainderTable 
+                WHERE noteId = ${noteId}; 
+  `;
   const addToArchiveQuery = `
-        INSERT INTO archiveTable(noteTitle,desp,userId,createdAt)
-        VALUES ('${noteTitle}','${desp}',${userId},'${date}')
+        INSERT INTO archiveTable(archiveId,noteTitle,desp,userId,createdAt)
+        VALUES (${noteId},'${noteTitle}','${desp}',${userId},'${date}')
   `;
   await db.run(addToArchiveQuery);
+  await db.run(deleteNoteFromRemainderQuery);
   await db.run(deleteNoteQuery);
+
   response.send({ message: "Note Moved To Archive" });
 });
 
@@ -261,8 +273,8 @@ app.put("/", authenticateToken, async (request, response) => {
 app.post("/unArchiveNote", authenticateToken, async (request, response) => {
   const { archiveId, userId, desp, date, noteTitle } = request.body;
   const addToNotesQuery = `
-    INSERT INTO notesTable(noteTitle,desp,userId,createdAt)
-    VALUES ('${noteTitle}','${desp}',${userId},'${date}');
+    INSERT INTO notesTable(noteId,noteTitle,desp,userId,createdAt)
+    VALUES (${archiveId},'${noteTitle}','${desp}',${userId},'${date}');
   `;
   const deleteFromArchiveQuery = `
     DELETE FROM archiveTable 
@@ -274,12 +286,12 @@ app.post("/unArchiveNote", authenticateToken, async (request, response) => {
 });
 
 //REMAINDER PAGE API
-app.get("/remainder", (request, response) => {
+app.get("/remainder", async (request, response) => {
   response.sendFile("pages/remainder.html", { root: __dirname });
 });
 
 //ADD TO REMAINDERS API
-app.put("/AddToRemainder", authenticateToken, async (request, response) => {
+app.put("/addToRemainder", authenticateToken, async (request, response) => {
   const { noteId, userId } = request.body;
   const addToRemainderQuery = `
         INSERT INTO remainderTable(userId,noteId)
@@ -305,7 +317,7 @@ app.post("/remainder", authenticateToken, async (request, response) => {
     let getCurrNoteQuery = `
         SELECT * 
         FROM notesTable
-        WHERE noteId = ${currNoteId}; 
+        WHERE notesTable.noteId = ${currNoteId} 
     `;
     currNote = await db.get(getCurrNoteQuery);
 
@@ -320,7 +332,8 @@ app.delete("/remainder", authenticateToken, async (request, response) => {
   const { userId, noteId } = request.body;
   const deleteRemainderQuery = `
         DELETE FROM remainderTable
-        WHERE noteId = ${noteId} AND userId = ${userId};
+        WHERE noteId = ${noteId};
     `;
   await db.run(deleteRemainderQuery);
+  response.send({ message: "Note Deleted From Remainder" });
 });

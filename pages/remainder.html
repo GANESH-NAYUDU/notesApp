@@ -90,7 +90,6 @@
             return response.json();
           })
           .then((jsonData) => {
-            console.log(jsonData);
             const allNotes = jsonData.allNotes;
             const noteContainer = document.querySelector(".remainderContainer");
             noteContainer.innerHTML = "";
@@ -129,6 +128,7 @@
                       return response.json();
                     })
                     .then((jsonData) => {
+                      console.log(jsonData.message);
                       fetchNotes();
                     });
                 });

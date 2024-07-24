@@ -239,10 +239,8 @@
               //Remainder Note
               const remainderBtn = document.querySelectorAll(".remainderBtn");
               remainderBtn.forEach((eachEL) => {
-                console.log(eachEL);
-                eachEL.addEventListener(
-                  "click",
-                  fetch("/AddToRemainder", {
+                eachEL.addEventListener("click", () => {
+                  fetch("/addToRemainder", {
                     method: "PUT",
                     headers: {
                       "Content-Type": "application/json",
@@ -259,8 +257,8 @@
                     })
                     .then((jsonData) => {
                       console.log(jsonData.message);
-                    })
-                );
+                    });
+                });
               });
               //
             });
