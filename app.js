@@ -337,3 +337,8 @@ app.delete("/remainder", authenticateToken, async (request, response) => {
   await db.run(deleteRemainderQuery);
   response.send({ message: "Note Deleted From Remainder" });
 });
+
+//SEARCH PAGE API
+app.get("/search", (request, response) => {
+  response.sendFile("pages/search.html", { root: __dirname });
+});

@@ -40,7 +40,9 @@
             <li class="nav-item">
               <a class="nav-link" id="trash-btn" href="/trash">Trash</a>
             </li>
-
+            <li class="nav-item">
+              <a class="nav-link" id="searchBtn" href="/search">Search</a>
+            </li>
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -61,18 +63,8 @@
               </ul>
             </li>
           </ul>
-          <form class="d-flex" role="search">
-            <input
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button class="btn btn-outline-success mr-2" type="submit">
-              Search
-            </button>
-          </form>
-          <div class="m-3">
+
+          <div id="logInContainer" class="m-3">
             <a href="/login">
               <button
                 id="login_button"
@@ -127,10 +119,36 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
-    <script>
+    <script type="module">
       const jwtToken = localStorage.getItem("jwtToken");
       const userId = JSON.parse(localStorage.getItem("userId"));
       const trashBtn = document.getElementById("trash-btn");
+      let logInBtnContainer = document.getElementById("logInContainer");
+      const searchBtn = document.getElementById("searchBtn");
+
+      // logout Buttton
+      if (userId !== null) {
+        logInBtnContainer.innerHTML = "";
+        logInBtnContainer.innerHTML += `
+           <a href="/login">
+                <button
+                  id="logout_button"
+                  type="button"
+                  class="btn btn-primary btn-sm p-1 m-1"
+                >
+                  Log out
+                </button></a
+              >
+      `;
+        const logoutBtn = document.getElementById("logout_button");
+        logoutBtn.addEventListener("click", () => {
+          localStorage.removeItem("userId");
+          localStorage.removeItem("jwtToken");
+        });
+      } else {
+        console.log("LOGGED OUT");
+      }
+      //
 
       const fetchNotes = () => {
         fetch("/getAllNotes", {
@@ -155,22 +173,22 @@
 
             allNotes.forEach((element) => {
               let note = `
-                    <div class="card mx-2 mt-2" style="width: 18rem">
-            <div class="card-body newNote">
-              <h5 class="card-title">${element.noteTitle}</h5>
-              <p class="card-text">
-               ${element.desp}
-              </p>
+                      <div class="card mx-2 mt-2" style="width: 18rem">
+              <div class="card-body newNote">
+                <h5 class="card-title">${element.noteTitle}</h5>
+                <p class="card-text">
+                 ${element.desp}
+                </p>
 
-      <button data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="btn btn-outline-dark btn-sm archiveBtn">Archive</button>
-      <button data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="btn btn-outline-dark btn-sm deleteBtn">Delete</button>
-       <button data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="btn btn-outline-dark btn-sm remainderBtn">Remind Me</button>
+        <button data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="btn btn-outline-dark btn-sm archiveBtn">Archive</button>
+        <button data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="btn btn-outline-dark btn-sm deleteBtn">Delete</button>
+         <button data-noteId="${element.noteId}" data-noteTitle="${element.noteTitle}" data-desp="${element.desp}" class="btn btn-outline-dark btn-sm remainderBtn">Remind Me</button>
 
 
 
+              </div>
             </div>
-          </div>
-                `;
+                  `;
 
               noteContainer.innerHTML += note;
 
